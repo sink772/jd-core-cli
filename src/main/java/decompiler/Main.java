@@ -8,7 +8,11 @@ import org.jd.core.v1.api.loader.Loader;
 import org.jd.core.v1.api.loader.LoaderException;
 import org.jd.core.v1.api.printer.Printer;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -116,7 +120,7 @@ public class Main {
 
     public static void main(String[] args) {
         if (args.length != 2) {
-            System.err.println("Usage: java -jar jdecomp.jar <classfile> <outfile>");
+            System.err.println("Usage: java -jar jd-core-cli.jar <classfile> <outfile>");
             return;
         }
         String infile = args[0];
@@ -124,11 +128,10 @@ public class Main {
         try {
             ClassFileToJavaSourceDecompiler decompiler = new ClassFileToJavaSourceDecompiler();
             decompiler.decompile(loader, printer, infile);
-            if (outfile.createNewFile()) {
-                FileWriter writer = new FileWriter(outfile);
-                writer.write(printer.toString());
-                writer.close();
-            }
+            // overwrite the output file
+            FileWriter writer = new FileWriter(outfile);
+            writer.write(printer.toString());
+            writer.close();
         } catch (Exception e) {
             e.printStackTrace();
         }

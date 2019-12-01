@@ -5,53 +5,12 @@ package decompiler;
 
 import org.jd.core.v1.ClassFileToJavaSourceDecompiler;
 import org.jd.core.v1.api.loader.Loader;
-import org.jd.core.v1.api.loader.LoaderException;
 import org.jd.core.v1.api.printer.Printer;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class Main {
-
-    private static Loader loader = new Loader() {
-        @Override
-        public byte[] load(String internalName) throws LoaderException {
-            System.out.println("*** load, internalName=" + internalName);
-            InputStream is = this.getClass().getResourceAsStream("/" + internalName + ".class");
-            if (is == null) {
-                Path path = Paths.get(internalName);
-                try {
-                    return Files.readAllBytes(path);
-                } catch (IOException e) {
-                    throw new LoaderException(e);
-                }
-            } else {
-                try (InputStream in=is; ByteArrayOutputStream out=new ByteArrayOutputStream()) {
-                    byte[] buffer = new byte[1024];
-                    int read = in.read(buffer);
-                    while (read > 0) {
-                        out.write(buffer, 0, read);
-                        read = in.read(buffer);
-                    }
-                    return out.toByteArray();
-                } catch (IOException e) {
-                    throw new LoaderException(e);
-                }
-            }
-        }
-
-        @Override
-        public boolean canLoad(String internalName) {
-            System.out.println("*** canLoad, internalName=" + internalName);
-            return this.getClass().getResource("/" + internalName + ".class") != null;
-        }
-    };
 
     private static Printer printer = new Printer() {
         protected static final String TAB = "    ";
@@ -123,11 +82,18 @@ public class Main {
             System.err.println("Usage: java -jar jd-core-cli.jar <classfile> <outfile>");
             return;
         }
-        String infile = args[0];
+        String basePath = new File(args[0]).getParent();
+        String filename = new File(args[0]).getName();
         File outfile = new File(args[1]);
+        if (!filename.endsWith(".class")) {
+            System.err.println("Error: invalid <classfile>");
+            return;
+        }
         try {
+            Loader loader = new DirectoryLoader(new File(basePath));
+            String internalName = filename.substring(0, filename.lastIndexOf(".class"));
             ClassFileToJavaSourceDecompiler decompiler = new ClassFileToJavaSourceDecompiler();
-            decompiler.decompile(loader, printer, infile);
+            decompiler.decompile(loader, printer, internalName);
             // overwrite the output file
             FileWriter writer = new FileWriter(outfile);
             writer.write(printer.toString());

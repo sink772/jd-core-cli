@@ -11,6 +11,12 @@ import java.io.File;
 import java.io.FileWriter;
 
 public class Main {
+    private static final boolean DEBUG = false;
+    private static void debugPrintf(String s, Object ... args) {
+        if (DEBUG) {
+            System.err.printf(s, args);
+        }
+    }
 
     private static Printer printer = new Printer() {
         protected static final String TAB = "    ";
@@ -22,34 +28,34 @@ public class Main {
         @Override public String toString() { return sb.toString(); }
 
         @Override public void start(int maxLineNumber, int majorVersion, int minorVersion) {
-            System.out.printf(">>> start - %d %d %d\n", maxLineNumber, majorVersion, minorVersion);
+            debugPrintf(">>> start - %d %d %d\n", maxLineNumber, majorVersion, minorVersion);
         }
         @Override public void end() {
-            System.out.println(">>> end");
+            debugPrintf(">>> end\n");
         }
 
         @Override public void printText(String text) {
-            System.out.printf(">>> printText - %s\n", text);
+            debugPrintf(">>> printText - %s\n", text);
             sb.append(text);
         }
         @Override public void printNumericConstant(String constant) {
-            System.out.printf(">>> printNumericConstant - %s\n", constant);
+            debugPrintf(">>> printNumericConstant - %s\n", constant);
             sb.append(constant);
         }
         @Override public void printStringConstant(String constant, String ownerInternalName) {
-            System.out.printf(">>> printStringConstant - %s %s\n", constant, ownerInternalName);
+            debugPrintf(">>> printStringConstant - %s %s\n", constant, ownerInternalName);
             sb.append(constant);
         }
         @Override public void printKeyword(String keyword) {
-            System.out.printf(">>> printKeyword - %s\n", keyword);
+            debugPrintf(">>> printKeyword - %s\n", keyword);
             sb.append(keyword);
         }
         @Override public void printDeclaration(int type, String internalTypeName, String name, String descriptor) {
-            System.out.printf(">>> printDeclaration - %d %s %s %s\n", type, internalTypeName, name, descriptor);
+            debugPrintf(">>> printDeclaration - %d %s %s %s\n", type, internalTypeName, name, descriptor);
             sb.append(name);
         }
         @Override public void printReference(int type, String internalTypeName, String name, String descriptor, String ownerInternalName) {
-            System.out.printf(">>> printReference - %d %s %s %s %s\n", type, internalTypeName, name, descriptor, ownerInternalName);
+            debugPrintf(">>> printReference - %d %s %s %s %s\n", type, internalTypeName, name, descriptor, ownerInternalName);
             sb.append(name);
         }
 
@@ -57,23 +63,23 @@ public class Main {
         @Override public void unindent() { this.indentationCount--; }
 
         @Override public void startLine(int lineNumber) {
-            System.out.printf(">>> startLine - %d\n", lineNumber);
+            debugPrintf(">>> startLine - %d\n", lineNumber);
             for (int i=0; i<indentationCount; i++) sb.append(TAB);
         }
         @Override public void endLine() {
-            System.out.println(">>> endLine");
+            debugPrintf(">>> endLine\n");
             sb.append(NEWLINE);
         }
         @Override public void extraLine(int count) {
-            System.out.printf(">>> extraLine - %d\n", count);
+            debugPrintf(">>> extraLine - %d\n", count);
             while (count-- > 0) sb.append(NEWLINE);
         }
 
         @Override public void startMarker(int type) {
-            System.out.printf(">>> startMarker - %d\n", type);
+            debugPrintf(">>> startMarker - %d\n", type);
         }
         @Override public void endMarker(int type) {
-            System.out.printf(">>> endMarker - %d\n", type);
+            debugPrintf(">>> endMarker - %d\n", type);
         }
     };
 

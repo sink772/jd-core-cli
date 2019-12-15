@@ -8,7 +8,7 @@ repositories {
 }
 
 dependencies {
-    compile files('libs/jd-core-1.0.6.jar')
+    compile 'org.jd:jd-core:1.1.2'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
